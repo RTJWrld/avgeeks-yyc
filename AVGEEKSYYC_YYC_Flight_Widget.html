@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AVGEEKSYYC | YYC Live Flight Tracker</title>
+<style>
+:root{--bg:#050b16;--panel:#091629;--line:#17395c;--blue:#168cff;--cyan:#63c5ff;--text:#eef6ff;--muted:#91a9c4;--green:#29e39a;--amber:#ffc66d}
+*{box-sizing:border-box} body{margin:0;background:transparent;color:var(--text);font:16px/1.4 "Segoe UI",Arial,sans-serif}
+.wrap{background:linear-gradient(145deg,rgba(4,12,26,.97),rgba(5,22,42,.96));border:1px solid #1a4d79;border-radius:16px;overflow:hidden;box-shadow:0 10px 40px #0008}
+header{padding:18px 22px;background:linear-gradient(100deg,#071326,#0d3154 68%,#071326);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{font-size:clamp(23px,3vw,38px);font-weight:900;letter-spacing:2px}.brand span{color:var(--blue)}.sub{font-size:11px;letter-spacing:3px;color:#b8d8f3;margin-top:2px}.live{font-size:12px;color:var(--green);white-space:nowrap}.dot{display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-right:7px;box-shadow:0 0 10px var(--green)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:14px 18px}.stat{padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#071426}.stat .num{font-size:26px;font-weight:800;color:var(--cyan)}.stat .label{font-size:10px;letter-spacing:1.6px;color:var(--muted);text-transform:uppercase}
+.main{display:grid;grid-template-columns:minmax(220px, .85fr) minmax(0,2fr);gap:14px;padding:0 18px 18px}.panel{background:rgba(2,10,21,.72);border:1px solid var(--line);border-radius:12px;overflow:hidden}.panelhead{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:13px;letter-spacing:1px}.map{padding:10px}.map svg{width:100%;height:auto;display:block;background:radial-gradient(ellipse,#0c2d4a,#061322 72%);border-radius:8px}.mapnote{font-size:11px;color:var(--muted);padding:8px 5px 2px}
+.tabs{display:flex;gap:7px}.tab{background:#0b1d32;color:#aac5df;border:1px solid #1a3c5d;border-radius:7px;padding:7px 11px;cursor:pointer;font-weight:700;font-size:11px}.tab.active{background:#0876e1;color:white;border-color:#168cff}
+.tablewrap{overflow:auto;max-height:420px}table{width:100%;border-collapse:collapse;min-width:480px}th{text-align:left;color:#83bce9;font-size:10px;letter-spacing:1px;background:#071426;padding:11px 10px;position:sticky;top:0}td{padding:10px;border-top:1px solid #122942;font-size:12px}tr:hover{background:#0c2036}.callsign{font-weight:800;color:#f3f8ff}.muted{color:var(--muted)}.pill{display:inline-block;border-radius:20px;padding:3px 7px;font-size:10px;font-weight:800;background:#12364d;color:#8ed5ff}.pill.in{background:#063d32;color:#56f0ba}.pill.out{background:#3a2b11;color:#ffd48a}
+footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 20px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);letter-spacing:.5px}.error{color:var(--amber)}.plane{fill:#52bdff;filter:drop-shadow(0 0 4px #168cff)}.empty{padding:25px;text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:720px){header{padding:14px}.main{grid-template-columns:1fr;padding:0 10px 10px}.stats{padding:10px;gap:6px}.stat{padding:9px}.stat .num{font-size:21px}.sub{letter-spacing:1.5px}.tablewrap{max-height:300px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><div><div class="brand">AVGEEKS<span>YYC</span></div><div class="sub">CALGARY INTERNATIONAL · LIVE AIR TRAFFIC</div></div><div style="text-align:right"><div class="live"><i class="dot"></i><span id="connection">CONNECTING</span></div><div id="clock" style="font-size:18px;font-weight:700;margin-top:5px">--:--:-- MDT</div></div></header>
+<div class="stats">
+ <div class="stat"><div class="num" id="total">—</div><div class="label">Aircraft nearby</div></div>
+ <div class="stat"><div class="num" id="inbound">—</div><div class="label">Likely inbound*</div></div>
+ <div class="stat"><div class="num" id="outbound">—</div><div class="label">Likely outbound*</div></div>
+</div>
+<div class="main">
+ <section class="panel"><div class="panelhead"><span>YYC RADAR VIEW</span><span class="muted" style="font-size:10px">CYYC · 51.13°N</span></div><div class="map">
+ <svg id="radar" viewBox="0 0 320 320" aria-label="Radar view of aircraft around Calgary airport">
+ <defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M 20 0 L 0 0 0 20" fill="none" stroke="#153550" stroke-width=".6"/></pattern></defs>
+ <rect width="320" height="320" fill="url(#grid)"/><g fill="none" stroke="#1b5578" stroke-width="1"><circle cx="160" cy="160" r="45"/><circle cx="160" cy="160" r="85"/><circle cx="160" cy="160" r="125"/><path d="M160 8V312M8 160H312"/></g>
+ <path d="M128 153 L192 153 L192 167 L128 167Z" fill="#8cb9d8" opacity=".75"/><path d="M153 128 L167 128 L167 192 L153 192Z" fill="#8cb9d8" opacity=".75"/><circle cx="160" cy="160" r="4" fill="#fff"/><text x="170" y="181" fill="#cbe8ff" font-size="11" font-weight="700">YYC</text><g id="planes"></g>
+ </svg><div class="mapnote">Live ADS-B positions within 50 nautical miles. Aircraft locations are approximate.</div></div></section>
+ <section class="panel"><div class="panelhead"><div>FLIGHT ACTIVITY</div><div class="tabs"><button class="tab active" data-filter="all">ALL</button><button class="tab" data-filter="in">INBOUND*</button><button class="tab" data-filter="out">OUTBOUND*</button></div></div>
+ <div class="tablewrap"><table><thead><tr><th>CALLSIGN</th><th>AIRCRAFT</th><th>ALTITUDE</th><th>SPEED</th><th>TRACK</th><th>RANGE</th><th>TYPE</th></tr></thead><tbody id="rows"><tr><td colspan="7" class="empty">Connecting to live aircraft feed…</td></tr></tbody></table></div>
+ </section>
+</div>
+<footer><span>AVGEEKSYYC · YYC / CYYC · CALGARY, ALBERTA</span><span id="updated">Waiting for first update</span><span>*Inbound/outbound are estimates from successive positions, not official flight plans.</span></footer>
+</div>
+<script>
+const API='https://api.adsb.lol/v2/lat/51.1215/lon/-114.0076/dist/50';
+const REFRESH_MS=30000, LAT=51.1215, LON=-114.0076;
+let aircraft=[], previousDistance=new Map(), filter='all', lastGood=0;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function distanceNm(lat,lon){const R=3440.065,p1=LAT*Math.PI/180,p2=lat*Math.PI/180,dp=(lat-LAT)*Math.PI/180,dl=(lon-LON)*Math.PI/180;const a=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2;return 2*R*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))}
+function fmtAlt(a){if(a==='ground'||a===0)return 'GND';if(typeof a==='number')return Math.round(a).toLocaleString()+' ft';return '—'}
+function classify(a){return a.direction||'unknown'}
+function render(){
+ $('total').textContent=aircraft.length;
+ $('inbound').textContent=aircraft.filter(a=>a.direction==='in').length;
+ $('outbound').textContent=aircraft.filter(a=>a.direction==='out').length;
+ const shown=aircraft.filter(a=>filter==='all'||a.direction===filter);
+ $('rows').innerHTML=shown.length?shown.slice(0,100).map(a=>`<tr><td class="callsign">${esc((a.flight||a.hex||'UNKNOWN').trim())}</td><td>${esc(a.t||'—')}<div class="muted">${esc(a.r||'')}</div></td><td>${fmtAlt(a.alt_baro)}</td><td>${typeof a.gs==='number'?Math.round(a.gs)+' kt':'—'}</td><td>${typeof a.track==='number'?Math.round(a.track)+'°':'—'}</td><td>${a.dist.toFixed(1)} nm</td><td><span class="pill ${a.direction}">${a.direction==='in'?'LIKELY IN':a.direction==='out'?'LIKELY OUT':'TRACKING'}</span></td></tr>`).join(''):'<tr><td colspan="7" class="empty">No aircraft match this view right now.</td></tr>';
+ const g=$('planes');g.innerHTML='';
+ aircraft.forEach(a=>{if(typeof a.lat!=='number'||typeof a.lon!=='number')return;const x=160+(a.lon-LON)*58*Math.cos(LAT*Math.PI/180),y=160-(a.lat-LAT)*58;if(x<7||x>313||y<7||y>313)return;const rot=typeof a.track==='number'?a.track:0;g.insertAdjacentHTML('beforeend',`<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) rotate(${rot})"><path class="plane" d="M0 -8 L2.4 -1 L7 2 L7 4 L2 3 L1.5 8 L-1.5 8 L-2 3 L-7 4 L-7 2 L-2.4 -1Z"/><circle r="9" fill="none" stroke="${a.direction==='in'?'#29e39a':a.direction==='out'?'#ffc66d':'#168cff'}" stroke-opacity=".45"/></g>`);});
+}
+async function update(){
+ try{
+  const res=await fetch(API,{cache:'no-store',mode:'cors'});if(!res.ok)throw new Error('Feed returned HTTP '+res.status);
+  const data=await res.json(), next=(data.ac||[]).filter(a=>typeof a.lat==='number'&&typeof a.lon==='number').map(a=>({...a,dist:distanceNm(a.lat,a.lon)}));
+  next.forEach(a=>{const key=a.hex||a.flight;if(previousDistance.has(key)){const delta=a.dist-previousDistance.get(key);a.direction=delta<-.25?'in':delta>.25?'out':'unknown'}else a.direction='unknown';previousDistance.set(key,a.dist)});
+  aircraft=next.sort((a,b)=>a.dist-b.dist);lastGood=Date.now();$('connection').textContent='LIVE FEED';$('connection').className='live';$('updated').textContent='Updated '+new Date().toLocaleTimeString()+' · refreshes every 30 sec';render();
+ }catch(e){$('connection').textContent='FEED UNAVAILABLE';$('connection').className='live error';$('updated').textContent='Could not refresh live feed. Retrying in 30 seconds.';if(!lastGood)$('rows').innerHTML='<tr><td colspan="7" class="empty error">Live aircraft feed is unavailable. Check internet access or try again shortly.</td></tr>';}
+}
+function tick(){const now=new Date();$('clock').textContent=now.toLocaleTimeString('en-CA',{timeZone:'America/Edmonton',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' MDT';}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');filter=b.dataset.filter;render()}));
+tick();setInterval(tick,1000);update();setInterval(update,REFRESH_MS);
+</script>
+</body>
+</html>
